@@ -178,6 +178,27 @@ http {
     return 301 https://${DOMAIN}\$request_uri;
   }
 
+  upstream maphubs {
+    server ${MAPHUBS_1_PORT_4000_TCP_ADDR}:80;
+  }
+
+  server {
+    listen 80;
+    server_name "${MAPHUBS_DOMAIN}";
+
+    location / {
+      proxy_pass http://maphubs;
+      proxy_set_header Host \$host;
+      proxy_set_header X-Real-IP \$remote_addr;
+      proxy_set_header X-Forwarded-For \$remote_addr;
+      proxy_set_header X-Forwarded-Proto \$scheme;
+      proxy_cache   anonymous;
+      proxy_read_timeout 600s;
+      proxy_send_timeout 600s;
+    }
+
+  }
+
   server {
     listen 80;
     listen 443 ssl;
