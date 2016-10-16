@@ -203,25 +203,25 @@ http {
     listen 80;
     listen 443 ssl;
     server_name crowdcover.us;
-    return 302 $scheme://maphubs.com;
+    return 302 \$scheme://maphubs.com;
   }
   server {
     listen 80;
     listen 443 ssl;
     server_name www.crowdcover.us;
-    return 302 $scheme://maphubs.com;
+    return 302 \$scheme://maphubs.com;
   }
   server {
     listen 80;
     listen 443 ssl;
     server_name crowdcover.org;
-    return 302 $scheme://maphubs.com;
+    return 302 \$scheme://maphubs.com;
   }
   server {
     listen 80;
     listen 443 ssl;
     server_name www.crowdcover.org;
-    return 302 $scheme://maphubs.com;
+    return 302 \$scheme://maphubs.com;
   }
 }
 EOF
