@@ -179,7 +179,7 @@ http {
   }
 
   upstream maphubs {
-    server ${MAPHUBS_1_PORT_4000_TCP_ADDR}:80;
+    server ${MAPHUBS_1_PORT_4000_TCP_ADDR}:4000;
   }
 
   server {
