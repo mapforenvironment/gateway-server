@@ -183,8 +183,25 @@ http {
   }
 
   server {
-    listen 80;
-    server_name "${MAPHUBS_DOMAIN}";
+    listen 443 ssl;
+    server_name "maphubs.com";
+
+    ssl_certificate /etc/letsencrypt/live/maphubs.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/maphubs.com/privkey.pem;
+    ssl_dhparam /etc/ssl/dhparams.pem;
+
+    ssl_ciphers "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA";
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+    ssl_session_tickets off;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    root /etc/letsencrypt/webrootauth;
 
     location / {
       proxy_pass http://maphubs;
@@ -197,6 +214,18 @@ http {
       proxy_send_timeout 600s;
     }
 
+    location /.well-known/acme-challenge {
+      alias /etc/letsencrypt/webrootauth/.well-known/acme-challenge;
+      location ~ /.well-known/acme-challenge/(.*) {
+        add_header Content-Type application/jose+json;
+      }
+    }
+  }
+
+  server {
+    listen 80;
+    server_name "maphubs.com";
+    return 301 https://maphubs.com\$request_uri;
   }
 
   upstream crowdcover {
@@ -204,8 +233,25 @@ http {
   }
 
   server {
-    listen 80;
+    listen 443 ssl;
     server_name "crowdcover.us";
+
+    ssl_certificate /etc/letsencrypt/live/crowdcover.us/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/crowdcover.us/privkey.pem;
+    ssl_dhparam /etc/ssl/dhparams.pem;
+
+    ssl_ciphers "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA";
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+    ssl_session_tickets off;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    root /etc/letsencrypt/webrootauth;
 
     location / {
       proxy_pass http://crowdcover;
@@ -218,6 +264,18 @@ http {
       proxy_send_timeout 600s;
     }
 
+    location /.well-known/acme-challenge {
+      alias /etc/letsencrypt/webrootauth/.well-known/acme-challenge;
+      location ~ /.well-known/acme-challenge/(.*) {
+        add_header Content-Type application/jose+json;
+      }
+    }
+  }
+
+  server {
+    listen 80;
+    server_name "crowdcover.us";
+    return 301 https://crowdcover.us\$request_uri;
   }
 
   server {
@@ -258,6 +316,22 @@ if [ ! -f /etc/letsencrypt/live/${TASKSDOMAIN}/fullchain.pem ]; then
     --email "${EMAIL}" --agree-tos --text --non-interactive
 fi
 
+if [ ! -f /etc/letsencrypt/live/crowdcover.us/fullchain.pem ]; then
+  letsencrypt certonly \
+    --domain crowdcover.us \
+    --authenticator standalone \
+    ${SERVER} \
+    --email "${EMAIL}" --agree-tos --text --non-interactive
+fi
+
+if [ ! -f /etc/letsencrypt/live/maphubs.com/fullchain.pem ]; then
+  letsencrypt certonly \
+    --domain maphubs.com \
+    --authenticator standalone \
+    ${SERVER} \
+    --email "${EMAIL}" --agree-tos --text --non-interactive
+fi
+
 # Template a cronjob to reissue the certificate with the webroot authenticator
 cat <<EOF >/etc/periodic/monthly/reissue
 #!/bin/sh
@@ -276,6 +350,18 @@ letsencrypt certonly --renew-by-default \
   --authenticator webroot \
   --webroot-path /etc/letsencrypt/webrootauth/ ${SERVER} \
   --email "${EMAIL}" --agree-tos --text --non-interactive
+
+letsencrypt certonly --renew-by-default \
+  --domain "crowdcover.us" \
+  --authenticator webroot \
+  --webroot-path /etc/letsencrypt/webrootauth/ ${SERVER} \
+  --email "${EMAIL}" --agree-tos --text --non-interactive
+
+  letsencrypt certonly --renew-by-default \
+    --domain "maphubs.com" \
+    --authenticator webroot \
+    --webroot-path /etc/letsencrypt/webrootauth/ ${SERVER} \
+    --email "${EMAIL}" --agree-tos --text --non-interactive
 
 # Reload nginx configuration to pick up the reissued certificates
 /usr/sbin/nginx -s reload
