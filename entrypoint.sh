@@ -205,7 +205,7 @@ http {
 
   server {
     listen 80;
-    server_name "new.crowdcover.us";
+    server_name "crowdcover.us";
 
     location / {
       proxy_pass http://crowdcover;
@@ -223,26 +223,20 @@ http {
   server {
     listen 80;
     listen 443 ssl;
-    server_name crowdcover.us;
-    return 302 \$scheme://maphubs.com;
-  }
-  server {
-    listen 80;
-    listen 443 ssl;
     server_name www.crowdcover.us;
-    return 302 \$scheme://maphubs.com;
+    return 302 \$scheme://crowdcover.us;
   }
   server {
     listen 80;
     listen 443 ssl;
     server_name crowdcover.org;
-    return 302 \$scheme://maphubs.com;
+    return 302 \$scheme://crowdcover.us;
   }
   server {
     listen 80;
     listen 443 ssl;
     server_name www.crowdcover.org;
-    return 302 \$scheme://maphubs.com;
+    return 302 \$scheme://crowdcover.us;
   }
 }
 EOF
