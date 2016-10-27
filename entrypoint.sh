@@ -194,9 +194,9 @@ http {
     ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
-    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
-    add_header X-Frame-Options DENY;
-    add_header X-Content-Type-Options nosniff;
+    #add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+    #add_header X-Frame-Options DENY;
+    #add_header X-Content-Type-Options nosniff;
     ssl_session_tickets off;
     ssl_stapling on;
     ssl_stapling_verify on;
@@ -225,7 +225,16 @@ http {
   server {
     listen 80;
     server_name "maphubs.com";
-    return 301 https://maphubs.com\$request_uri;
+    location / {
+      proxy_pass http://maphubs;
+      proxy_set_header Host \$host;
+      proxy_set_header X-Real-IP \$remote_addr;
+      proxy_set_header X-Forwarded-For \$remote_addr;
+      proxy_set_header X-Forwarded-Proto \$scheme;
+      proxy_cache   anonymous;
+      proxy_read_timeout 600s;
+      proxy_send_timeout 600s;
+    }
   }
 
   upstream crowdcover {
