@@ -179,7 +179,7 @@ http {
   }
 
   upstream maphubs {
-    server ${MAPHUBS_1_PORT_4000_TCP_ADDR}:4000;
+    server 199.34.228.49;
   }
 
   server {
@@ -204,7 +204,7 @@ http {
     root /etc/letsencrypt/webrootauth;
 
     location / {
-      proxy_pass http://199.34.228.49;
+      proxy_pass http://maphubs;
       proxy_set_header Host \$host;
       proxy_set_header X-Real-IP \$remote_addr;
       proxy_set_header X-Forwarded-For \$remote_addr;
