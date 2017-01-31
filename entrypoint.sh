@@ -178,10 +178,6 @@ http {
     return 301 https://${DOMAIN}\$request_uri;
   }
 
-  upstream maphubsnew {
-    server 199.34.228.49:80;
-  }
-
   server {
     listen 443 ssl;
     server_name "maphubs.com";
@@ -204,7 +200,7 @@ http {
     root /etc/letsencrypt/webrootauth;
 
     location / {
-      proxy_pass http://maphubsnew;
+      proxy_pass http://website.maphubs.com:80;
       proxy_set_header Host \$host;
       proxy_set_header X-Real-IP \$remote_addr;
       proxy_set_header X-Forwarded-For \$remote_addr;
