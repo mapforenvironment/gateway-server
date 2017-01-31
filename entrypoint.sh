@@ -179,7 +179,7 @@ http {
   }
 
   upstream maphubsnew {
-    server 199.34.228.49;
+    server 199.34.228.49:80;
   }
 
   server {
