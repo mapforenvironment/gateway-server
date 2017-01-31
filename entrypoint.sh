@@ -194,8 +194,8 @@ http {
     ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
-    add_header Strict-Transport-Security "max-age=63072000; preload";
-    add_header X-Frame-Options DENY;
+    #add_header Strict-Transport-Security "max-age=63072000; preload";
+    #add_header X-Frame-Options DENY;
     add_header X-Content-Type-Options nosniff;
     ssl_session_tickets off;
     ssl_stapling on;
@@ -204,7 +204,7 @@ http {
     root /etc/letsencrypt/webrootauth;
 
     location / {
-      proxy_pass http://maphubs;
+      proxy_pass http://199.34.228.49;
       proxy_set_header Host \$host;
       proxy_set_header X-Real-IP \$remote_addr;
       proxy_set_header X-Forwarded-For \$remote_addr;
@@ -338,6 +338,7 @@ cat <<EOF >/etc/periodic/monthly/reissue
 
 set -euo pipefail
 TERM=xterm
+mkdir -p /etc/letsencrypt/webrootauth
 # Certificate reissue
 letsencrypt certonly --renew-by-default \
   --domain "${TASKSDOMAIN}" \
